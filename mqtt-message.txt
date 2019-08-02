@@ -1,0 +1,27 @@
+{
+  "current_temperature_topic": "heatpumpcontroller/climate/my_custom_climate/current_temperature/state",
+  "mode_command_topic": "heatpumpcontroller/climate/my_custom_climate/mode/command",
+  "mode_state_topic": "heatpumpcontroller/climate/my_custom_climate/mode/state",
+  "modes": [
+    "auto",
+    "off",
+    "cool",
+    "heat"
+  ],
+  "temperature_command_topic": "heatpumpcontroller/climate/my_custom_climate/target_temperature/command",
+  "temperature_state_topic": "heatpumpcontroller/climate/my_custom_climate/target_temperature/state",
+  "min_temp": 10,
+  "max_temp": 30,
+  "temp_step": 0.1,
+  "name": "My Custom Climate",
+  "availability_topic": "heatpumpcontroller/status",
+  "unique_id": "ESPclimatemy_custom_climate",
+  "device": {
+    "identifiers": "3c71bf5984c4",
+    "name": "heatpumpcontroller",
+    "sw_version": "esphome v1.13.6 Aug  1 2019, 20:22:18",
+    "model": "Silicognition wESP32",
+    "manufacturer": "espressif"
+  }
+}
+

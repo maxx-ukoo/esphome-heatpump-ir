@@ -1,0 +1,56 @@
+esphome:
+  name: heatpumpcontroller
+  platform: ESP32
+  board: wesp32
+  includes:
+    - heatpumpcontroller.h
+  libraries:
+    - "IRremoteESP8266"
+    - "Adafruit BMP085 Library"
+
+web_server:
+  port: 80    
+
+mqtt:
+  broker: 192.168.0.101
+
+ethernet:
+  type: LAN8720
+  mdc_pin: GPIO16
+  mdio_pin: GPIO17
+  clk_mode: GPIO0_IN
+  phy_addr: 0
+
+i2c:
+  sda: 33
+  scl: 5
+  scan: True  
+
+sensor:
+  - platform: bmp085
+    temperature:
+      name: "Outside Temperature"
+    pressure:
+      name: "Outside Pressure"
+    update_interval: 60s
+
+
+climate:
+  - platform: custom
+    id: my_custom_climate
+    lambda: |-
+      auto my_custom_climate = new MyHeatPumpClimate();
+      App.register_component(my_custom_climate);
+      return {my_custom_climate};
+    climates:
+      - name: "My Custom Climate"
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: "otapass"
+
+ota:
+  password: "otapass"
