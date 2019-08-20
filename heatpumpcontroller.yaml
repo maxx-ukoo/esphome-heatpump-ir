@@ -5,7 +5,7 @@ esphome:
   includes:
     - heatpumpcontroller.h
   libraries:
-    - "IRremoteESP8266"
+    - "HeatpumpIR"
     - "Adafruit BMP085 Library"
 
 web_server:
@@ -29,21 +29,33 @@ i2c:
 sensor:
   - platform: bmp085
     temperature:
+      id: bmp085_temperature
       name: "Outside Temperature"
     pressure:
       name: "Outside Pressure"
     update_interval: 60s
 
+binary_sensor:
+  - platform: gpio
+    pin: GPIO15
+    name: "Switch"    
+    on_press:
+      then:
+        - climate.control:
+            id: my_cliamte
+            mode: COOL
+            target_temperature: 21°C
 
 climate:
   - platform: custom
     id: my_custom_climate
     lambda: |-
-      auto my_custom_climate = new MyHeatPumpClimate();
+      auto my_custom_climate = new MyHeatPumpClimate(bmp085_temperature);
       App.register_component(my_custom_climate);
       return {my_custom_climate};
     climates:
       - name: "My Custom Climate"
+        id: my_cliamte
 
 # Enable logging
 logger:
