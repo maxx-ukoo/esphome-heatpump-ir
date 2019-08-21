@@ -10,27 +10,27 @@ class MyHeatPumpClimate : public Component, public Climate {
  public:
   // constructor
 
-  MyHeatPumpClimate(sensor::Sensor *sensor) {
+  MyHeatPumpClimate(esphome::sensor::Sensor **sensor) {
     this->sensor_ = sensor;
   }
 
   void setup() override {
     heatpumpIR = new R51MHeatpumpIR();
-    powerModeCmd = POWER_OFF;
-    operatingModeCmd = MODE_AUTO;
-    fanSpeedCmd = FAN_AUTO;
-    temperatureCmd = 22;
-    swingVCmd = VDIR_AUTO;
-    swingHCmd = HDIR_AUTO;
-    //this->sensor_->add_on_state_callback([this](float state) {
-      //this->current_temperature = state;
-      // control may have changed, recompute
-      //this->compute_state_();
-      // current temperature changed, publish state
-      //this->publish_state();
-    //});
-    //this->current_temperature = this->sensor_->state;
-    ESP_LOGI("custom", "Setup climat OK");
+    this->powerModeCmd = POWER_OFF;
+    this->operatingModeCmd = MODE_AUTO;
+    this->fanSpeedCmd = FAN_AUTO;
+    this->temperatureCmd = 22;
+    this->target_temperature = this->temperatureCmd;
+    this->swingVCmd = VDIR_AUTO;
+    this->swingHCmd = HDIR_AUTO;
+    if (*this->sensor_ != nullptr) {
+          (*this->sensor_)->add_on_state_callback([this](float state) {
+            ESP_LOGI("custom", "Climat receive temperature update: %f", state);
+            this->current_temperature = state;
+            this->compute_state_();
+            this->publish_state();
+          });
+    }
   }
 
   ClimateTraits traits() override {
@@ -48,10 +48,9 @@ class MyHeatPumpClimate : public Component, public Climate {
     if (call.get_mode().has_value())
         this->mode = *call.get_mode();
     if (call.get_target_temperature().has_value()) {
-      ESP_LOGI("custom_heat", "Set temp to : %f", *call.get_target_temperature());
-      ESP_LOGI("custom_heat", "Old: %i", temperatureCmd);
-      temperatureCmd =  *call.get_target_temperature();     
-      ESP_LOGI("custom_heat", "New: %i", temperatureCmd);
+      ESP_LOGI("custom_heat", "Set target temperature to : %f", *call.get_target_temperature());
+      this->temperatureCmd =  *call.get_target_temperature();
+      this->target_temperature = temperatureCmd;     
     }
     //if (call.get_target_temperature_low().has_value())
     //    this->target_temperature_low = *call.get_target_temperature_low();
@@ -61,6 +60,7 @@ class MyHeatPumpClimate : public Component, public Climate {
     //    this->change_away_(*call.get_away());
     this->compute_state_();
     this->publish_state();
+    this->transmit_state();
   }
 
   void compute_state_() {
@@ -85,7 +85,8 @@ class MyHeatPumpClimate : public Component, public Climate {
     }
   }
 
-  void publish_state() {
+
+  void transmit_state() {
     ESP_LOGI("custom_heat", "Sed data via IR  power : %i, mode: %i, fan: %i, temp: %i, sV: %i, sH: %i",  powerModeCmd, operatingModeCmd, fanSpeedCmd, temperatureCmd, swingVCmd, swingHCmd);
     IRSenderESP32 irSender(2, 0);  
     heatpumpIR->send(irSender, powerModeCmd, operatingModeCmd, fanSpeedCmd, temperatureCmd, swingVCmd, swingHCmd);
@@ -99,6 +100,5 @@ class MyHeatPumpClimate : public Component, public Climate {
     uint8_t temperatureCmd;
     uint8_t swingVCmd;
     uint8_t swingHCmd;
-    sensor::Sensor *sensor_{nullptr};
-
+    esphome::sensor::Sensor **sensor_{nullptr};
 };

@@ -50,7 +50,7 @@ climate:
   - platform: custom
     id: my_custom_climate
     lambda: |-
-      auto my_custom_climate = new MyHeatPumpClimate(bmp085_temperature);
+      auto my_custom_climate = new MyHeatPumpClimate(&bmp085_temperature);
       App.register_component(my_custom_climate);
       return {my_custom_climate};
     climates:
