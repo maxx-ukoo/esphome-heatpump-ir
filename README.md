@@ -1,5 +1,5 @@
 
-#ESPHome config to control Midea conditioner
+# ESPHome config to control Midea conditioner
 
 Features
 - Support AUTO, HEAT, COOL modes
@@ -22,8 +22,9 @@ This config can be controlled via OpenHAB with MQTT
 1. Create items
 ```` 
 Group  HEAT "Heat"
-Number H_TEMP "Температура [%.1f С]" <temperature> (HEAT) { mqtt=">[broker:heatpumpcontroller/climate/my_custom_climate/target_temperature/command:command:*:default]" }
+Number H_TARGET_TEMP "Температура [%.1f С]" <temperature> (HEAT) { mqtt=">[broker:heatpumpcontroller/climate/my_custom_climate/target_temperature/command:command:*:default]" }
 String H_MODE "Режим" (HEAT) { mqtt=">[broker:heatpumpcontroller/climate/my_custom_climate/mode/command:command:*:default]" }
+Number H_CURRENT_TEMP "Температура поточна [%.1f С]" <temperature> (HEAT) { mqtt="<[broker:heatpumpcontroller/climate/my_custom_climate/current_temperature/state:state:default]" }
 ````
 2. Create config for sitemap
 ````
@@ -37,3 +38,4 @@ Frame label="Heat" {
 Result should be like:
 ![](ui-config.png)
 
+Tested on SENSEI air conditioner with R51M/E remote control.
